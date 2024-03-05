@@ -1,0 +1,14 @@
+server:
+  port: 8080
+spring:
+  jpa:
+    show-sql: on
+    database: postgresql
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: jdbc:postgresql://postgres_db:5432/productDb
+    password: postgrespas
+    username: postgres
+    driver-class-name: org.postgresql.Driver
+    name: productDb
