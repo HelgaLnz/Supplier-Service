@@ -15,5 +15,8 @@ databaseChangeLog:
                   name: id
                   type: INTEGER
               - column:
+                  constraints:
+                    nullable: false
+                    unique: true
                   name: name
-                  type: VARCHAR(255)
+                  type: VARCHAR(100)

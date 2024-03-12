@@ -6,6 +6,7 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: none
+    open-in-view: false
   datasource:
     url: jdbc:postgresql://postgres_db:5432/productDb
     password: postgrespas
