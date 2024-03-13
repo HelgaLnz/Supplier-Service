@@ -2,6 +2,8 @@ package com.example.supplierservice.service;
 
 import com.example.supplierservice.entity.Category;
 import com.example.supplierservice.entity.Product;
+import com.example.supplierservice.exception.ObjectAlreadyExistsException;
+import com.example.supplierservice.exception.ObjectNotFoundException;
 import com.example.supplierservice.repository.ProductRepository;
 import com.example.supplierservice.request.ProductDto;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +21,16 @@ public class ProductService {
 
   public void create(ProductDto.Full request) {
     Category category = categoryService.get(request.getCategoryId());
-    productRepository.save(Product.builder()
-      .name(request.getName())
-      .description(request.getDescription())
-      .price(request.getPrice())
-      .category(category)
-      .build());
+
+    if (!productRepository.existsProductByName(request.getName())) {
+      productRepository.save(Product.builder()
+        .name(request.getName())
+        .description(request.getDescription())
+        .price(request.getPrice())
+        .category(category)
+        .build());
+    } else
+      throw new ObjectAlreadyExistsException("Product already exists with name '" + request.getName() + "'");
   }
 
   public Page<ProductDto.Display> getAll(Pageable pageable) {
@@ -45,7 +51,7 @@ public class ProductService {
       .price(product.getPrice())
       .category(product.getCategory())
       .build()
-    ).orElseThrow();
+    ).orElseThrow(() -> new ObjectNotFoundException("Product with " + id + " not found."));
   }
 
   public ProductDto.Full change(ProductDto.Full productNew, Integer id) {
@@ -76,7 +82,10 @@ public class ProductService {
   }
 
   public ProductDto.Full delete(Integer id) {
-    Product productDeleted = productRepository.findById(id).orElseThrow();
+    Product productDeleted = productRepository
+      .findById(id)
+      .orElseThrow(() -> new ObjectNotFoundException("Product with " + id + " not found."));
+
     productRepository.deleteById(id);
     return ProductDto.Full.builder()
       .name(productDeleted.getName())

@@ -12,4 +12,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
   @Query(value = "select p from Product p join fetch p.category category")
   Page<Product> findAllProducts(Pageable pageable);
+
+  @Query("select (count(p) > 0) from Product p where p.name = ?1")
+  Boolean existsProductByName(String name);
 }

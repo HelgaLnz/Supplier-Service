@@ -2,6 +2,7 @@ package com.example.supplierservice.controller;
 
 import com.example.supplierservice.request.ProductDto;
 import com.example.supplierservice.service.ProductService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class ProductController {
   private final ProductService productService;
 
   @PostMapping("/products")
-  public ResponseEntity<?> createProduct(@RequestBody ProductDto.Full request) {
+  public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDto.Full request) {
     productService.create(request);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
@@ -38,7 +39,7 @@ public class ProductController {
   }
 
   @PutMapping("/products/{id}")
-  public ResponseEntity<?> putProduct(@RequestBody ProductDto.Full request, @PathVariable Integer id) {
+  public ResponseEntity<?> editProduct(@Valid @RequestBody ProductDto.Full request, @PathVariable Integer id) {
     return new ResponseEntity<>(productService.change(request, id), HttpStatus.OK);
   }
 
