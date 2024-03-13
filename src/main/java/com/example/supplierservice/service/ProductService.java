@@ -20,7 +20,9 @@ public class ProductService {
   private final CategoryService categoryService;
 
   public void create(ProductDto.Full request) {
-    Category category = categoryService.get(request.getCategoryId());
+    Category category = Category.builder()
+      .name(categoryService.getById(request.getCategoryId()).name())
+      .build();
 
     if (!productRepository.existsProductByName(request.getName())) {
       productRepository.save(Product.builder()
@@ -55,7 +57,9 @@ public class ProductService {
   }
 
   public ProductDto.Full change(ProductDto.Full productNew, Integer id) {
-    Category category = categoryService.get(productNew.getCategoryId());
+    Category category = Category.builder()
+      .name(categoryService.getById(productNew.getCategoryId()).name())
+      .build();
 
     Product productResult = productRepository.findById(id)
       .map(product -> {
