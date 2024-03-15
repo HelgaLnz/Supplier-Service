@@ -21,7 +21,7 @@ public class ProductService {
 
   public void create(ProductDto.Full request) {
     Category category = Category.builder()
-      .name(categoryService.getById(request.getCategoryId()).name())
+      .name(categoryService.getByIdEntity(request.getCategoryId()).getName())
       .build();
 
     if (!productRepository.existsProductByName(request.getName())) {
@@ -57,32 +57,33 @@ public class ProductService {
   }
 
   public ProductDto.Full change(ProductDto.Full productNew, Integer id) {
-    Category category = Category.builder()
-      .name(categoryService.getById(productNew.getCategoryId()).name())
-      .build();
+    Category category = categoryService.getByIdEntity(productNew.getCategoryId());
 
-    Product productResult = productRepository.findById(id)
-      .map(product -> {
-        product.setName(productNew.getName());
-        product.setDescription(productNew.getDescription());
-        product.setPrice(productNew.getPrice());
-        product.setCategory(category);
-        return productRepository.save(product);
-      }).orElseGet(() -> productRepository.save(Product.builder()
-        .name(productNew.getName())
-        .description(productNew.getDescription())
-        .price(productNew.getPrice())
-        .category(category)
-        .id(id)
-        .build())
-      );
+    if (!productRepository.existsProductByName(productNew.getName())) {
 
-    return ProductDto.Full.builder()
-      .name(productResult.getName())
-      .description(productResult.getDescription())
-      .price(productResult.getPrice())
-      .categoryId(productResult.getCategory().getId())
-      .build();
+      Product productResult = productRepository.findById(id)
+        .map(product -> {
+          product.setName(productNew.getName());
+          product.setDescription(productNew.getDescription());
+          product.setPrice(productNew.getPrice());
+          product.setCategory(category);
+          return productRepository.save(product);
+        }).orElse(Product.builder()
+          .name(productNew.getName())
+          .description(productNew.getDescription())
+          .price(productNew.getPrice())
+          .category(category)
+          .id(id)
+          .build());
+
+      return ProductDto.Full.builder()
+        .name(productResult.getName())
+        .description(productResult.getDescription())
+        .price(productResult.getPrice())
+        .categoryId(productResult.getCategory().getId())
+        .build();
+    } else
+      throw new ObjectAlreadyExistsException("Product already exists with name '" + productNew.getName() + "'");
   }
 
   public ProductDto.Full delete(Integer id) {

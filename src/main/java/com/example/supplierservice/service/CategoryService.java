@@ -61,4 +61,9 @@ public class CategoryService {
       .name(categoryDeleted.getName())
       .build();
   }
+
+  public Category getByIdEntity(Integer id) {
+    return categoryRepository.findById(id)
+      .orElseThrow(() -> new ObjectNotFoundException("Category with " + id + " not found."));
+  }
 }
