@@ -27,7 +27,8 @@ public class CategoryService {
       categoryRepository.save(Category.builder()
         .name(category.name())
         .build());
-    } else throw new ObjectAlreadyExistsException("Category already exists with name '" + category.name() + "'");
+    } else
+      throw new ObjectAlreadyExistsException("Category already exists with name '" + category.name() + "'");
   }
 
   public Page<CategoryDto.Display> getAll(Pageable pageable) {
@@ -38,18 +39,23 @@ public class CategoryService {
   }
 
   public CategoryDto.Display change(CategoryDto.Display categoryNew, Integer id) {
-    Category categoryResult = categoryRepository.findById(id)
-      .map(category -> {
-        category.setName(categoryNew.name());
-        return categoryRepository.save(category);
-      }).orElseGet(() -> categoryRepository.save(Category.builder()
-        .name(categoryNew.name())
-        .build())
-      );
+    if (!categoryRepository.existsByName(categoryNew.name())) {
 
-    return CategoryDto.Display.builder()
-      .name(categoryResult.getName())
-      .build();
+      Category categoryResult = categoryRepository.findById(id)
+        .map(category -> {
+          category.setName(categoryNew.name());
+          return categoryRepository.save(category);
+        }).orElse(Category.builder()
+          .name(categoryNew.name())
+          .build()
+        );
+
+      return CategoryDto.Display.builder()
+        .name(categoryResult.getName())
+        .build();
+    } else
+      throw new ObjectAlreadyExistsException("Category already exists with name '" + categoryNew.name() + "'");
+
   }
 
   public CategoryDto.Display delete(Integer id) {

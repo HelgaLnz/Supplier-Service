@@ -20,16 +20,13 @@ public class ProductService {
   private final CategoryService categoryService;
 
   public void create(ProductDto.Full request) {
-    Category category = Category.builder()
-      .name(categoryService.getByIdEntity(request.getCategoryId()).getName())
-      .build();
 
     if (!productRepository.existsProductByName(request.getName())) {
       productRepository.save(Product.builder()
         .name(request.getName())
         .description(request.getDescription())
         .price(request.getPrice())
-        .category(category)
+        .category(categoryService.getByIdEntity(request.getCategoryId()))
         .build());
     } else
       throw new ObjectAlreadyExistsException("Product already exists with name '" + request.getName() + "'");
